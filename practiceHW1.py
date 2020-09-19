@@ -1,124 +1,83 @@
 def game(quantity, numbers):
-    sum1 = 0
-    sum2 = 0
-    odd_indexes_sum = 0
-    even_indexes_sum = 0
-    if quantity % 2 == 0:
-        for i in range(0, quantity):
-            if i % 2 == 0:
-                even_indexes_sum += numbers[i]
-            else:
-                odd_indexes_sum += numbers[i]
-        if even_indexes_sum > odd_indexes_sum:
-            for i in range(0, quantity // 2):
-                to_delete = last(numbers)
-                if to_delete % 2 == 0:
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                else:
-                    to_delete = first(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-        else:
-            for i in range(0, quantity // 2):
-                to_delete = last(numbers)
-                if to_delete % 2 == 1:
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                else:
-                    to_delete = first(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-    else:
+    sum1, sum2, odd_indexes_sum, even_indexes_sum = 0, 0, 0, 0
+    change = False
+    if quantity % 2 == 1:
         to_delete = lowest_diff(numbers)
-        sum1 += numbers[to_delete]
+        sum2 += numbers[to_delete]
         del numbers[to_delete]
-        for i in range(0, quantity - 1):
-            if i % 2 == 0:
-                even_indexes_sum += numbers[i]
-            else:
-                odd_indexes_sum += numbers[i]
-        if even_indexes_sum > odd_indexes_sum:
-            for i in range(0, (quantity - 1) // 2):
-                to_delete = last(numbers)
-                if to_delete % 2 == 0:
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                else:
-                    to_delete = first(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
+        change = True
+        quantity = quantity - 1
+
+    for i in range(0, quantity):
+        if i % 2 == 0:
+            even_indexes_sum += numbers[i]
         else:
-            for i in range(0, (quantity - 1) // 2):
-                to_delete = last(numbers)
-                if to_delete % 2 == 1:
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                else:
-                    to_delete = first(numbers)
-                    sum2 += numbers[to_delete]
-                    numbers[to_delete] = 0
-                    to_delete = lowest_diff(numbers)
-                    sum1 += numbers[to_delete]
-                    numbers[to_delete] = 0
-    if sum1 > sum2:
-        print('Player ', 1, ' won')
-    elif sum2 > sum1:
-        print('Player ', 2, ' won')
+            odd_indexes_sum += numbers[i]
+
+    if even_indexes_sum > odd_indexes_sum:
+        looking_for_remainder = 0
     else:
-        print('Player ', 0, ' won (draw)')
-    print('Player 1 - ', sum1)
-    print('Player 2 - ', sum2)
+        looking_for_remainder = 1
+
+    for i in range(0, quantity // 2):
+        if last(numbers) % 2 == looking_for_remainder:
+            to_delete = last(numbers)
+        else:
+            to_delete = first(numbers)
+
+        sum1 += numbers[to_delete]
+        numbers[to_delete] = 0
+        to_delete = lowest_diff(numbers)
+        sum2 += numbers[to_delete]
+        numbers[to_delete] = 0
+
+    answers = [sum1, sum2]
+    if change:
+        answers.reverse()
+    if answers[0] > answers[1]:
+        answers.append(1)
+    elif answers[1] > answers[0]:
+        answers.append(2)
+    else:
+        answers.append(0)
+    return answers
 
 
 def lowest_diff(numbers):
-    if numbers[first(numbers)] - numbers[first(numbers) + 1] > numbers[last(numbers)] - numbers[last(numbers) - 1]:
-        return first(numbers)
+    first_value = first(numbers)
+    last_value = last(numbers)
+    if numbers[first_value] - numbers[first_value + 1] > numbers[last_value] - numbers[last_value - 1]:
+        return first_value
     else:
-        return last(numbers)
+        return last_value
 
 
 def first(numbers):
-    for x in range(0, len(numbers)):
-        if numbers[x] != 0:
-            return x
+    for y in range(0, len(numbers)):
+        if numbers[y] != 0:
+            return y
 
 
 def last(numbers):
-    for x in range(len(numbers), -1, - 1):
-        if numbers[x - 1] != 0:
-            return x - 1
+    for z in range(len(numbers), -1, - 1):
+        if numbers[z - 1] != 0:
+            return z - 1
 
 
-print('Enter the amount of elements you want to play with(up to 100):')
-amount = int(input())
-elements = [int(x) for x in input("Enter multiple values(up to 1000): ").split()]
-no_error = True
-for x in range(0, len(elements)):
-    if elements[x] > 999:
-        no_error = False
-if len(elements) == amount and amount < 100 and no_error:
-    game(amount, elements)
-else:
+try:
+    print('Enter the amount of elements you want to play with(up to 100):')
+    amount = int(input())
+    elements = list(map(int, input('Enter multiple values(up to 1000) separated by space: ').split()))
+    for x in range(0, len(elements)):
+        if elements[x] > 999 or elements[x] < 1:
+            raise ValueError
+    if len(elements) != amount or amount > 100 or amount < 1:
+        raise ValueError
+    else:
+        result = game(amount, elements)
+        print('Player', result[2], 'won')
+        print('Player 1 score =', result[0])
+        print('Player 2 score =', result[1])
+except ValueError:
     print('Wrong input')
+
