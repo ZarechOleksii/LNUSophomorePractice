@@ -26,10 +26,25 @@ def random_array(new_size_rand, lower_bound, higher_bound):
     return new_array_rand
 
 
+def sorting(numbers, old_indexes):
+    swapped = True
+    while swapped:
+        swapped = False
+        for z in range(0, len(numbers) - 1):
+            if numbers[z] > numbers[z + 1]:
+                temp = numbers[z]
+                numbers[z] = numbers[z + 1]
+                numbers[z + 1] = temp
+                temp = old_indexes[z]
+                old_indexes[z] = old_indexes[z + 1]
+                old_indexes[z + 1] = temp
+                swapped = True
+
+
 def menu():
     print('\nChoose your action:\n1.Enter a to create a new array with size N and random numbers')
     print('2.Enter b to create a new custom array\n3.Enter s to see present arrays')
-    print('4.Enter d to delete an array\n5.Enter f to sort and find value in an array')
+    print('4.Enter d to delete an array\n5.Enter f to find value in an array')
     print('6.Enter m to merge two arrays into a binary array and transform to decimal number')
     print('7.Enter e to exit menu')
 
@@ -109,14 +124,19 @@ while True:
             try:
                 actions = 0
                 indexes = []
-                to_look_inside = available_arrays[int(input('Enter the number of the array to search in: ')) - 1]
+                one_index = (int(input('Enter the number of the array to search in: ')) - 1)
+                to_look_inside = available_arrays[one_index].copy()
                 look_for = int(input('Enter a value to find in the array: '))
                 print('Looking for', look_for, 'in', to_look_inside, 'using binary search')
-                to_look_inside.sort()
+                start_indexes = []
+                for x in range(0, len(to_look_inside)):
+                    start_indexes.append(x)
+                sorting(to_look_inside, start_indexes)
                 actions += 1
                 print(str(actions) + '.Sorted array:', to_look_inside)
                 from_pos = 0
                 to_pos = len(to_look_inside) - 1
+                mid_index = 0
                 while to_pos >= from_pos:
                     mid_index = (from_pos + to_pos) // 2
                     actions += 1
@@ -130,37 +150,41 @@ while True:
                         actions += 1
                         print(str(actions) + '.The number we are looking for is in the left half')
                     elif to_look_inside[mid_index] == look_for:
-                        indexes.append(mid_index)
+                        indexes.append(start_indexes[mid_index])
                         actions += 1
-                        print(str(actions) + '.Found first instance of', look_for, 'at index', mid_index)
+                        print(str(actions) + '.Found first instance of', look_for, 'at index', mid_index,)
+                        print('  It was index', start_indexes[mid_index], 'in unsorted array')
                         break
                 if len(indexes) == 0:
                     print('The number', look_for, 'is not present in array', to_look_inside)
                     print('Actions done =', actions)
                 else:
-                    for x in range(indexes[0] + 1, len(to_look_inside)):
+                    for x in range(mid_index + 1, len(to_look_inside)):
                         actions += 1
                         print(str(actions) + '.Looking for another instance at index', x)
                         if to_look_inside[x] == look_for:
-                            indexes.append(x)
+                            indexes.append(start_indexes[x])
                             actions += 1
                             print(str(actions) + '.Found another instance at index', x)
+                            print('  It was index', start_indexes[x], 'in unsorted array')
                         else:
                             actions += 1
                             print(str(actions) + '.Not found at', x)
                             break
-                    for x in range(indexes[0] - 1, -1, -1):
+                    for x in range(mid_index - 1, -1, -1):
                         actions += 1
                         print(str(actions) + '.Looking for another instance at index', x)
                         if to_look_inside[x] == look_for:
-                            indexes.append(x)
+                            indexes.append(start_indexes[x])
                             actions += 1
                             print(str(actions) + '.Found another instance at', x)
+                            print('  It was index', start_indexes[x], 'in unsorted array')
                         else:
                             actions += 1
                             print(str(actions) + '.Not found at', x)
                             break
-                    print('The indexes of number', look_for, 'in array', to_look_inside, 'are', indexes)
+                    indexes.sort()
+                    print('The indexes of', look_for, 'in array', available_arrays[one_index], 'are', indexes)
                     print('Actions done =', actions)
             except ValueError:
                 print('Number needed')
@@ -170,3 +194,4 @@ while True:
             print('Not enough present arrays')
     else:
         print('Only choices a, b, d, m, s, f, e are possible')
+
