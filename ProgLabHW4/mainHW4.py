@@ -60,7 +60,7 @@ while True:
         id_to_edit = input()
         if not Validation.validate_int(id_to_edit):
             id_to_edit = int(id_to_edit)
-            if not Validation.validate_bounds(id_to_edit - 1, all_events):
+            if all_events.present(id_to_edit):
                 obj_to_edit = all_events.find_by_id(id_to_edit)
                 print(obj_to_edit)
                 print('\nEnter the parameter you want to edit:')
@@ -114,7 +114,8 @@ while True:
         if not Validation.validate_int(to_delete):
             to_delete = int(to_delete)
             print('Removing element with ID', to_delete)
-            if all_events.delete_id(to_delete):
+            if all_events.present(to_delete):
+                all_events.delete_id(to_delete)
                 print('Element with ID', to_delete, 'was removed')
                 all_events.rewrite()
             else:

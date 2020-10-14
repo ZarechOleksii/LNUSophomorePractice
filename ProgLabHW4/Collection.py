@@ -97,3 +97,9 @@ class Collection:
         writing = open(self.open_file, 'w')
         writing.write(to_write)
         writing.close()
+
+    def present(self, given_id):
+        for q in range(0, len(self.all_events)):
+            if given_id == self.all_events[q].id:
+                return True
+        return False

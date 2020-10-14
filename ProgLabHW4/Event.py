@@ -1,4 +1,4 @@
-from Validation import *
+from Validation import Validation
 
 
 class Event:
