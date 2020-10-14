@@ -1,7 +1,40 @@
+from Event import Event
+
 
 class Collection:
-    def __init__(self):
+
+    search_dict = {'id': 'ID',
+                   'duration': 'duration',
+                   'price': 'price',
+                   'rest_name': 'restaurant name',
+                   'title': 'title',
+                   'date': 'starting date',
+                   'time': 'starting time'}
+    list_to_read = ['id', 'title', 'rest_name', 'date', 'time', 'duration', 'price']
+    open_file = ''
+
+    def __init__(self, file_name):
+        line = 0
         self.all_events = []
+        self.open_file = file_name
+        dict_to_read = dict()
+        reading = open(self.open_file, 'r')
+        file_list = reading.readlines()
+        for x in file_list:
+            line += 1
+            print('Line', line, 'initialization:')
+            line_list = x.split('| ')
+            for y in range(0, len(line_list)):
+                dict_to_read[self.list_to_read[y]] = line_list[y]
+            dict_to_read['date'] = dict_to_read['date'].split('-')
+            dict_to_read['time'] = dict_to_read['time'].split(':')
+            new_event = Event(dict_to_read)
+            if new_event.id != 0:
+                self.all_events.append(new_event)
+                print('Line', line, 'initialized properly')
+            else:
+                print('Line', line, 'was not initialized properly')
+        reading.close()
 
     def append(self, given_event):
         self.all_events.append(given_event)
@@ -15,50 +48,26 @@ class Collection:
     def __str__(self):
         to_return_all = ''
         for q in range(0, len(self.all_events)):
-            to_return_all += '\n' + str(self.all_events[q]) + '\n'
+            to_return_all += str(self.all_events[q])
         return to_return_all
 
-    def delete_at(self, g_index):
-        if (g_index + 1) == len(self):
-            self.all_events.pop()
-        else:
-            self.all_events[g_index] = self.all_events.pop()
-            self.all_events[g_index].id = g_index + 1
-        return 'Event with ID ' + str(g_index + 1) + ' removed'
+    def find_by_id(self, g_id):
+        for q in range(0, len(self.all_events)):
+            if g_id == self.all_events[q].id:
+                return self.all_events[q]
 
-    def sorting(self, by_what):
-        sort_parameter = []
-        if by_what == 'D':
-            for q in range(0, len(self)):
-                sort_parameter.append(self.all_events[q].duration)
-        if by_what == 'P':
-            for q in range(0, len(self)):
-                sort_parameter.append(float(self.all_events[q].price[0:-2]))
-        if by_what == 'Ti':
-            for q in range(0, len(self)):
-                time_string = self.all_events[q].date_time.strftime("%H") + self.all_events[q].date_time.strftime("%M")
-                sort_parameter.append(time_string)
-        if by_what == 'Da':
-            for q in range(0, len(self)):
-                date_string = self.all_events[q].date_time.strftime("%Y")
-                date_string += self.all_events[q].date_time.strftime("%m")
-                date_string += self.all_events[q].date_time.strftime("%d")
-                sort_parameter.append(date_string)
-        if by_what == 'R':
-            for q in range(0, len(self)):
-                sort_parameter.append(self.all_events[q].rest_name.name)
-        if by_what == 'T':
-            for q in range(0, len(self)):
-                sort_parameter.append(self.all_events[q].title)
-        paired = zip(sort_parameter, self.all_events)
-        if by_what == 'R' or by_what == 'T':
-            paired = sorted(paired, key=lambda a: (a[0].lower()))
+    def delete_id(self, g_id):
+        for q in range(0, len(self.all_events)):
+            if g_id == self.all_events[q].id:
+                self.all_events.pop(q)
+                return True
+        return False
+
+    def sorting2(self, by_what):
+        if by_what == 'title':
+            self.all_events = sorted(self.all_events, key=lambda b: getattr(b, by_what).lower())
         else:
-            paired = sorted(paired)
-        result = ''
-        for q in paired:
-            result += '\n' + str(q[1]) + '\n'
-        return result
+            self.all_events = sorted(self.all_events, key=lambda b: getattr(b, by_what))
 
     @staticmethod
     def search_loop(to_look_for, to_be_checked):
@@ -72,72 +81,19 @@ class Collection:
                 return True
         return False
 
-    def search(self, looking_for, is_int, is_float):
+    def search2(self, looking_for):
         to_return_found = ''
-        if is_int:
-            for q in range(0, len(self)):
-                to_check = str(self.all_events[q].id)
-                if self.search_loop(looking_for, to_check):
-                    to_return_found += 'There is an event with ID ' + to_check + '\n'
-
-        for q in range(0, len(self)):
-            to_check = self.all_events[q].title
-            if self.search_loop(looking_for, to_check):
-                to_return_found += 'Event with ID ' + str(self.all_events[q].id) + ' has title ' + to_check + '\n'
-
-        if not is_int and not is_float:
-            for q in range(0, len(self)):
-                to_check = self.all_events[q].rest_name.name
-                if self.search_loop(looking_for, to_check):
-                    to_return_found += 'Event with ID ' + str(self.all_events[q].id)
-                    to_return_found += ' has restaurant name ' + to_check + '\n'
-
-        if is_int:
-            lower_bound = 0
-            higher_bound = 5
-        elif not is_float:
-            lower_bound = 5
-            higher_bound = 7
-        else:
-            lower_bound, higher_bound = 0, 0
-        for x in range(lower_bound, higher_bound):
-            if x == 0:
-                part_of_date_time = "%d"
-                part_of_return = ' has day of month '
-            elif x == 1:
-                part_of_date_time = "%m"
-                part_of_return = ' has month with number '
-            elif x == 2:
-                part_of_date_time = "%Y"
-                part_of_return = ' has year '
-            elif x == 3:
-                part_of_date_time = "%H"
-                part_of_return = ' starts at hour '
-            elif x == 4:
-                part_of_date_time = "%M"
-                part_of_return = ' starts at minute '
-            elif x == 5:
-                part_of_date_time = "%A"
-                part_of_return = ' has weekday '
-            else:
-                part_of_date_time = "%B"
-                part_of_return = ' has month '
-            for q in range(0, len(self)):
-                to_check = self.all_events[q].date_time.strftime(part_of_date_time)
-                if self.search_loop(looking_for, to_check):
-                    to_return_found += 'Event with ID ' + str(self.all_events[q].id)
-                    to_return_found += part_of_return + to_check + '\n'
-
-        if is_float or is_int:
-            for q in range(0, len(self)):
-                to_check = str(self.all_events[q].duration)
-                if self.search_loop(looking_for, to_check):
-                    to_return_found += 'Event with ID ' + str(self.all_events[q].id)
-                    to_return_found += ' has duration ' + to_check + '\n'
-
-        for q in range(0, len(self)):
-            to_check = self.all_events[q].price
-            if self.search_loop(looking_for, to_check):
-                to_return_found += 'Event with ID ' + str(self.all_events[q].id)
-                to_return_found += ' has price ' + to_check + '\n'
+        for q in self.search_dict:
+            for j in range(0, len(self)):
+                if self.search_loop(looking_for, str(getattr(self.all_events[j], q))):
+                    to_return_found += 'Event with ID ' + str(self.all_events[j].id) + ' has '
+                    to_return_found += self.search_dict[q] + ' ' + str(getattr(self.all_events[j], q)) + '\n'
         return to_return_found
+
+    def rewrite(self):
+        to_write = ''
+        for q in self.all_events:
+            to_write += q.to_write() + '\n'
+        writing = open(self.open_file, 'w')
+        writing.write(to_write)
+        writing.close()
