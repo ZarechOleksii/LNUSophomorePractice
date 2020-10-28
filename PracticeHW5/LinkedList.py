@@ -1,5 +1,6 @@
 from Node import Node
 from LinkedListIterator import LinkedListIterator
+from Validation import Validation
 
 
 class LinkedList:
@@ -70,6 +71,8 @@ class LinkedList:
             self.head = None
             self.head = the_next
 
+    @Validation.decorator_is_int
+    @Validation.decorator_position_delete
     def remove_at(self, position):
         if position == 0:
             self.remove_first()
@@ -82,12 +85,16 @@ class LinkedList:
                 current += 1
                 traversal = traversal.link
             traversal.link = traversal.link.link
+        return True
 
+    @Validation.decorator_are_int
+    @Validation.decorator_positions_delete
     def remove_from_to(self, posit_from, posit_to):
         to_do = posit_to - posit_from
         while to_do != -1:
             self.remove_at(posit_from)
             to_do -= 1
+        return True
 
     def get_head(self):
         return self.head
