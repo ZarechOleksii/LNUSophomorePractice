@@ -7,6 +7,7 @@ class Caretaker:
         self.momento_history = []
         self.pointer = -1
         self.undone = 0
+        self.history_size = 5
 
     def new_action(self, new_momento, new_desc):
         while self.undone != 0:
@@ -15,7 +16,7 @@ class Caretaker:
             self.undone -= 1
         self.description_history.append(new_desc)
         self.momento_history.append(new_momento)
-        if self.pointer == 5:
+        if self.pointer == self.history_size:
             self.description_history.pop(0)
             self.momento_history.pop(0)
         else:

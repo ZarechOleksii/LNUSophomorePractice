@@ -1,7 +1,7 @@
 from Event import Event
 from Validation import Validation
 from Caretaker import Caretaker
-import copy
+from Momento import Momento
 
 
 class Collection:
@@ -40,11 +40,11 @@ class Collection:
                 print('Line', line, 'was not initialized properly')
         reading.close()
         self.history = Caretaker()
-        self.history.new_action(self.Momento(self.all_events), 'Initialization')
+        self.history.new_action(Momento(self.all_events), 'Initialization')
 
     def append(self, given_event):
         self.all_events.append(given_event)
-        self.history.new_action(self.Momento(self.all_events), ('Added new element with ID ' + str(given_event.id)))
+        self.history.new_action(Momento(self.all_events), ('Added new element with ID ' + str(given_event.id)))
 
     def __len__(self):
         return len(self.all_events)
@@ -67,7 +67,7 @@ class Collection:
         for q in range(0, len(self.all_events)):
             if g_id == self.all_events[q].id:
                 self.all_events.pop(q)
-                self.history.new_action(self.Momento(self.all_events), ('Deleted element with ID ' + str(g_id)))
+                self.history.new_action(Momento(self.all_events), ('Deleted element with ID ' + str(g_id)))
                 return True
         return False
 
@@ -76,7 +76,7 @@ class Collection:
             self.all_events = sorted(self.all_events, key=lambda b: getattr(b, by_what).lower())
         else:
             self.all_events = sorted(self.all_events, key=lambda b: getattr(b, by_what))
-        self.history.new_action(self.Momento(self.all_events), ('Sorted by ' + self.search_dict[by_what]))
+        self.history.new_action(Momento(self.all_events), ('Sorted by ' + self.search_dict[by_what]))
 
     @staticmethod
     def search_loop(to_look_for, to_be_checked):
@@ -118,7 +118,7 @@ class Collection:
 
     def edit_one(self, event_to_edit, g_param, g_value):
         if event_to_edit.edit_value(g_param, g_value):
-            self.history.new_action(self.Momento(self.all_events), ('Edited element with ID' + str(event_to_edit.id)))
+            self.history.new_action(Momento(self.all_events), ('Edited element with ID' + str(event_to_edit.id)))
             return True
         else:
             return False
@@ -132,10 +132,3 @@ class Collection:
         action = self.history.redo()
         if action is not False:
             self.all_events = action.get_momento_value()
-
-    class Momento:
-        def __init__(self, given):
-            self.all_events_momento = copy.deepcopy(given)
-
-        def get_momento_value(self):
-            return self.all_events_momento
