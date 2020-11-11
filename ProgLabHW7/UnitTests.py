@@ -16,11 +16,10 @@ class TestHW7(unittest.TestCase):
         self.assertTrue(Collection('ToRead.txt'), 'Fail file name (cannot happen)')
 
     def test_validation_id(self):
-        self.assertEqual(Event(self.test_dict).id, 1, 'Failed to create object')
-        self.test_dict['id'] = 'abc'
-        self.assertNotEqual(Event(self.test_dict).id, 'abc', 'ID is not a number')
-        self.test_dict['id'] = '-5'
-        self.assertNotEqual(Event(self.test_dict).id, -5, 'ID is negative')
+        wrong_ids = ['abc', '-5']
+        for x in wrong_ids:
+            self.test_dict['id'] = x
+            self.assertEqual(Event(self.test_dict).id, -1)
 
         self.test_dict['id'] = '1'
         self.assertEqual(Event(self.test_dict).id, 1, 'ID was not accepted')
@@ -63,42 +62,30 @@ class TestHW7(unittest.TestCase):
         self.assertEqual(Event(self.test_dict).id, 1, 'Restaurant name was not accepted')
 
     def test_validation_title(self):
-        self.test_dict['title'] = '-abc'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Title contains forbidden characters')
-        self.test_dict['title'] = '|abc'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Title contains forbidden characters')
-        self.test_dict['title'] = ':abc'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Title contains forbidden characters')
+        wrong_titles = ['-abc', '|abc', ':abc']
+
+        for x in wrong_titles:
+            self.test_dict['title'] = x
+            self.assertNotEqual(Event(self.test_dict).id, 1)
 
         self.test_dict['title'] = 'abc'
         self.assertEqual(Event(self.test_dict).id, 1, 'Title was not accepted')
 
     def test_validation_date(self):
-        self.test_dict['date'] = ['20a0', '2', '22']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Year contains letters')
-        self.test_dict['date'] = ['2020', 'a', '22']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Month contains letters')
-        self.test_dict['date'] = ['2020', '2', 'a']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Day contains letters')
-        self.test_dict['date'] = ['2020', '2', '30']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Day out of range')
-        self.test_dict['date'] = ['2019', '2', '29']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Day out of range')
-        self.test_dict['date'] = ['2019', '15', '15']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Month out of range')
+        wrong_dates = [['20a0', '2', '22'], ['2020', 'a', '22'], ['2020', '2', 'a'], ['2020', '2', '30'],
+                       ['2019', '2', '29'], ['2019', '15', '15']]
+        for x in wrong_dates:
+            self.test_dict['date'] = x
+            self.assertNotEqual(Event(self.test_dict).id, 1)
 
         self.test_dict['date'] = ['2020', '2', '28']
         self.assertEqual(Event(self.test_dict).id, 1, 'Date was not accepted')
 
     def test_validation_time(self):
-        self.test_dict['time'] = ['1a', '59']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Hour contains letters')
-        self.test_dict['time'] = ['14', '5a']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Minute contains letters')
-        self.test_dict['time'] = ['14', '60']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Minute out of range')
-        self.test_dict['time'] = ['24', '00']
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Hour out of range')
+        wrong_time = [['1a', '59'], ['14', '5a'], ['14', '60'], ['24', '00']]
+        for x in wrong_time:
+            self.test_dict['time'] = x
+            self.assertNotEqual(Event(self.test_dict).id, 1)
 
         self.test_dict['time'] = ['14', '30']
         self.assertEqual(Event(self.test_dict).id, 1, 'Time was not accepted')
@@ -136,103 +123,40 @@ class TestHW7(unittest.TestCase):
     def test_collection_sort_write(self):
         test_collection = Collection('Tests/SortTest.txt')
 
-        #   testing sorting by title
-        test_collection.sorting2('T')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByTitle.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong title sort')
+        def get_file_content(way):
+            content_f = open(way, 'r')
+            content_text = content_f.read()
+            content_f.close()
+            return content_text
 
-        #   testing sorting by id
-        test_collection.sorting2('I')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByID.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong id sort')
+        def compare(way):
+            test_collection.rewrite()
+            manual_action = get_file_content(way)
+            program_action = get_file_content('Tests/SortTest.txt')
+            self.assertEqual(manual_action, program_action)
 
-        #   testing sorting by restaurant names
-        test_collection.sorting2('R')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByRestaurantName.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong restaurant names sort')
+        arguments = ['T', 'I', 'R', 'Da', 'Ti', 'D', 'P', 'I']
+        comparisons = ['ByTitle.txt', 'ByID.txt', 'ByRestaurantName.txt', 'ByDate.txt', 'ByTime.txt', 'ByDuration.txt',
+                       'ByPrice.txt', 'ByID.txt']
 
-        #   testing sorting by date
-        test_collection.sorting2('Da')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByDate.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong date sort')
-
-        #   testing sorting by time
-        test_collection.sorting2('Ti')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByTime.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong time sort')
-
-        #   testing sorting by duration
-        test_collection.sorting2('D')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByDuration.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong duration sort')
-
-        #   testing sorting by price
-        test_collection.sorting2('P')
-        test_collection.rewrite()
-        manual_file = open('Tests/ByPrice.txt', 'r')
-        manually_sorted = manual_file.read()
-        manual_file.close()
-        program_file = open('Tests/SortTest.txt')
-        program_sorted = program_file.read()
-        program_file.close()
-        self.assertEqual(manually_sorted, program_sorted, 'Wrong price sort')
-
-        test_collection.sorting2('I')
-        test_collection.rewrite()
+        for x in range(0, len(arguments)):
+            test_collection.sorting2(arguments[x])
+            compare('Tests/' + comparisons[x])
 
     def test_collection_searching(self):
         test_collection = Collection('Tests/SearchTest.txt')
+        search_args = ['NotExists', '', '10', 'Event', '20']
+        to_find = ['', '',
+                   'Event with ID 10 has ID 10\nEvent with ID 5 has price 10.5\n',
 
-        self.assertEqual(test_collection.search2('NotExists'), '', 'Should not find anything')
+                   'Event with ID 5 has title FourthEvent\nEvent with ID 10 has title firstEvent\n',
 
-        self.assertEqual(test_collection.search2(''), '', 'Should not find anything')
+                   'Event with ID 1 has starting date 2019-05-25\n'
+                   'Event with ID 5 has starting date 2005-11-22\n'
+                   'Event with ID 10 has starting date 2021-12-31\n']
 
-        to_find = 'Event with ID 10 has ID 10\nEvent with ID 5 has price 10.5\n'
-        self.assertEqual(test_collection.search2('10'), to_find, 'Should find same')
-
-        to_find = 'Event with ID 5 has title FourthEvent\nEvent with ID 10 has title firstEvent\n'
-        self.assertEqual(test_collection.search2('Event'), to_find, 'Should find same')
-
-        to_find = 'Event with ID 1 has starting date 2019-05-25\n'
-        to_find += 'Event with ID 5 has starting date 2005-11-22\n'
-        to_find += 'Event with ID 10 has starting date 2021-12-31\n'
-        self.assertEqual(test_collection.search2('20'), to_find, 'Should find same')
+        for x in range(0, len(search_args)):
+            self.assertEqual(test_collection.search2(search_args[x]), to_find[x])
 
     def test_history(self):
         test_dict = {'id': '1',
@@ -244,172 +168,34 @@ class TestHW7(unittest.TestCase):
                      'time': ['14', '30']}
         test_collection = Collection('TestsHistory/ChangingFile.txt')
 
-        test_collection.delete_id(4)
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action1.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
+        def get_file_content(way):
+            content_f = open(way, 'r')
+            content_text = content_f.read()
+            content_f.close()
+            return content_text
 
-        test_collection.delete_id(1)
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action2.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
+        def compare(way):
+            test_collection.rewrite()
+            manual_action = get_file_content(way)
+            program_action = get_file_content('TestsHistory/ChangingFile.txt')
+            self.assertEqual(manual_action, program_action)
 
-        test_collection.append(Event(test_dict))
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action3.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
+        testing_funcs = [test_collection.delete_id, test_collection.delete_id, test_collection.append,
+                         test_collection.delete_id, test_collection.undo, test_collection.undo,
+                         test_collection.undo, test_collection.redo, test_collection.redo,
+                         test_collection.undo, test_collection.delete_id, test_collection.redo,
+                         test_collection.undo, test_collection.undo, test_collection.undo, test_collection.undo]
+        arguments = [4, 1, Event(test_dict), 14, None, None, None, None, None, None, 8, None, None, None, None, None]
+        comparisons = ['Action1.txt', 'Action2.txt', 'Action3.txt', 'Action4.txt', 'Action3.txt', 'Action2.txt',
+                       'Action1.txt', 'Action2.txt', 'Action3.txt', 'Action2.txt', 'Action3Alternative.txt',
+                       'Action3Alternative.txt', 'Action2.txt', 'Action1.txt', 'Start.txt', 'Start.txt']
 
-        test_collection.delete_id(14)
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action4.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        # going back in history
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action3.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action2.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action1.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   going forward in history
-        test_collection.redo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action2.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        test_collection.redo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action3.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   going back again
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action2.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   changing history in some place
-        test_collection.delete_id(8)
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action3Alternative.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   trying to redo after undoing and then doing another action
-        test_collection.redo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action3Alternative.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   going back to start
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action2.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Action1.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Start.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
-
-        #   trying to undo when there is nothing to undo
-        test_collection.undo()
-        test_collection.rewrite()
-        manual_file = open('TestsHistory/Start.txt', 'r')
-        manual_action = manual_file.read()
-        manual_file.close()
-        program_file = open('TestsHistory/ChangingFile.txt')
-        program_action = program_file.read()
-        program_file.close()
-        self.assertEqual(manual_action, program_action)
+        for x in range(0, len(testing_funcs)):
+            if arguments[x] is None:
+                testing_funcs[x]()
+            else:
+                testing_funcs[x](arguments[x])
+            compare('TestsHistory/' + comparisons[x])
 
 
 if __name__ == '__main__':
