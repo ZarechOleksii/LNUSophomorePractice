@@ -22,7 +22,7 @@ class Strategy:
                 break
             iterator += 1
         if pos == 0:
-            Event.to_do('add', [before, pos, first_part])
+            Event.to_do('add', [before, pos, first_part, 'addition'])
             return first_part
         else:
             iterator = 0
@@ -32,7 +32,7 @@ class Strategy:
                     x.link = first_part.get_head()
                     break
 
-        Event.to_do('add', [before, pos, given_list])
+        Event.to_do('add', [before, pos, given_list, 'addition'])
         return given_list
 
 

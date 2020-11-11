@@ -88,7 +88,7 @@ class LinkedList:
                 current += 1
                 traversal = traversal.link
             traversal.link = traversal.link.link
-        Event.to_do('delete', [before, position, self])
+        Event.to_do('delete', [before, position, self, 'deletion'])
         return True
 
     @Validation.decorator_are_int
@@ -115,7 +115,7 @@ class LinkedList:
                 to_delete = to_delete.link
                 to_do -= 1
             from_delete.link = to_delete
-        Event.to_do('delete', [before, [posit_from, posit_to], self])
+        Event.to_do('delete', [before, [posit_from, posit_to], self, 'deletion'])
         return True
 
     def get_head(self):

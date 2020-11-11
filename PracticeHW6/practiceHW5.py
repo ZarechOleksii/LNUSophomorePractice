@@ -48,8 +48,8 @@ list_dict = {'1': first_list,
 context = Context()
 first_strategy = FirstStrategy()
 second_strategy = SecondStrategy()
-Observer.attach('add', Logger.adding_to_list_print)
-Observer.attach('delete', Logger.deleting_from_list_print)
+Observer.attach('add', Logger.changing_list_print)
+Observer.attach('delete', Logger.changing_list_print)
 Observer.attach('main_func', Logger.main_list_method_print)
 
 while True:
