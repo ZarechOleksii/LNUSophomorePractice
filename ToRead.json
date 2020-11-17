@@ -1,0 +1,56 @@
+[
+    {
+        "id": "1",
+        "title": "CorrectEvent",
+        "rest_name": "1",
+        "date": "2025-10-17",
+        "time": "00:50:00",
+        "duration": "4.2",
+        "price": "2.53"
+    },
+    {
+        "id": "3",
+        "title": "FirstEvent",
+        "rest_name": "3",
+        "date": "2005-11-22",
+        "time": "17:30:00",
+        "duration": "5.5",
+        "price": "10.5"
+    },
+    {
+        "id": "4",
+        "title": "created Event",
+        "rest_name": "2",
+        "date": "2021-12-31",
+        "time": "23:59:00",
+        "duration": "4.0",
+        "price": "0.0"
+    },
+    {
+        "id": "8",
+        "title": "firstEvent",
+        "rest_name": "3",
+        "date": "2025-10-20",
+        "time": "14:30:00",
+        "duration": "3.5",
+        "price": "20.5"
+    },
+    {
+        "id": "14",
+        "title": "SecondEvent",
+        "rest_name": "1",
+        "date": "2001-11-22",
+        "time": "10:30:00",
+        "duration": "5.5",
+        "price": "10.5"
+    },
+    {
+        "id": "24",
+        "title": "TesterEvent",
+        "rest_name": "1",
+        "date": "2019-02-28",
+        "time": "10:30:00",
+        "duration": "3.5",
+        "price": "6.4"
+    }
+]
