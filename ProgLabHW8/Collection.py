@@ -111,6 +111,8 @@ class Collection:
                     if self.search_loop(looking_for, str(getattr(self.all_events[j], q))):
                         to_return_found.append(self.all_events[j].to_write())
                         break
+        else:
+            return self.create_event_list()
         return to_return_found
 
     def create_event_list(self):

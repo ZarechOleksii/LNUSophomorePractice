@@ -22,8 +22,9 @@ def print_all_and_search():
     if 'what' in request.args:
         to_search = request.args['what']
         return jsonify(all_events.search3(to_search))
-    elif 'sort_by' in request.args and 'sort_type' in request.args:
-        to_return = all_events.sorting3(request.args['sort_by'], request.args['sort_type'])
+    elif 'sort_by' in request.args and 'sort_type' in request.args and 's' in request.args:
+        found_events = Collection(all_events.search3(request.args['s']))
+        to_return = found_events.sorting3(request.args['sort_by'], request.args['sort_type'])
     else:
         to_return = all_events.create_event_list()
     return jsonify(to_return)
