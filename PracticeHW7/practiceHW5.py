@@ -46,13 +46,22 @@ def print_list(l_num, g_list):
 
 
 def print_dict(g_dict):
+    g_arr = []
+    for z in g_dict:
+        g_arr.append((z, g_dict[z], ))
+    create_threads({print_list: g_arr})
+
+
+def create_threads(g_dict):
     threads = []
-    for z in list_dict:
-        threads.append(threading.Thread(target=print_list, args=(z, g_dict[z],)))
-    for z in threads:
-        z.start()
-    for z in threads:
-        z.join()
+    for q in g_dict:
+        for x in g_dict[q]:
+            thread = threading.Thread(target=q, args=x)
+            threads.append(thread)
+    for q in threads:
+        q.start()
+    for q in threads:
+        q.join()
 
 
 strategy = 0
@@ -101,12 +110,7 @@ while True:
     elif user_choice == 'd':
         print_dict(list_dict)
         position = input('Enter position to delete an element: ')
-        thread1 = threading.Thread(target=list_dict['1'].remove_at, args=(position,))
-        thread2 = threading.Thread(target=list_dict['2'].remove_at, args=(position,))
-        thread1.start()
-        thread2.start()
-        thread1.join()
-        thread2.join()
+        create_threads({list_dict['1'].remove_at: [(position,)], list_dict['2'].remove_at: [(position,)]})
         print('Lists now:')
         print_dict(list_dict)
 
@@ -114,23 +118,14 @@ while True:
         print_dict(list_dict)
         pos_fr = input('Enter position from which to delete elements: ')
         pos_to = input('Enter position to which elements will be deleted: ')
-        thread1 = threading.Thread(target=list_dict['1'].remove_from_to, args=(pos_fr, pos_to,))
-        thread2 = threading.Thread(target=list_dict['2'].remove_from_to, args=(pos_fr, pos_to,))
-        thread1.start()
-        thread2.start()
-        thread1.join()
-        thread2.join()
+        g_tuple = (pos_fr, pos_to,)
+        create_threads({list_dict['1'].remove_from_to: [g_tuple], list_dict['2'].remove_from_to: [g_tuple]})
         print('Lists now:')
         print_dict(list_dict)
 
     elif user_choice == 'm':
         if len(list_dict['1']) == len(list_dict['2']):
-            thread1 = threading.Thread(target=merge, args=(list_dict['1'], list_dict['2'],))
-            thread2 = threading.Thread(target=merge, args=(list_dict['2'], list_dict['1'],))
-            thread1.start()
-            thread2.start()
-            thread1.join()
-            thread2.join()
+            create_threads({merge: [(list_dict['1'], list_dict['2'],), (list_dict['2'], list_dict['1'],)]})
         else:
             print('Lists have different size')
 
