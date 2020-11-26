@@ -156,4 +156,3 @@ class Validation:
                 print('ID has to be integer')
                 return False
         return find_validator
-

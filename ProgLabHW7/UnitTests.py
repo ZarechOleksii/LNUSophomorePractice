@@ -25,32 +25,22 @@ class TestHW7(unittest.TestCase):
         self.assertEqual(Event(self.test_dict).id, 1, 'ID was not accepted')
 
     def test_validation_duration(self):
-        self.test_dict['duration'] = 'abc'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Duration is not a number')
-        self.test_dict['duration'] = '-3'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Duration is negative')
+        wrong_durations = ['abc', '-3', '2', '1.2312']
+        initialized = [1, 1, -1, -1]
+        for x in range(0, len(wrong_durations)):
+            self.test_dict['duration'] = wrong_durations[x]
+            self.assertNotEqual(Event(self.test_dict).id, initialized[x])
 
-        self.test_dict['duration'] = '2'
-        self.assertEqual(Event(self.test_dict).id, 1, 'Duration did not let initialization to happen')
-        self.assertEqual(Event(self.test_dict).duration, 2, 'Duration is wrong')
-        self.test_dict['duration'] = '2.421'
-        self.assertEqual(Event(self.test_dict).id, 1, 'Duration did not let initialization to happen')
-        self.assertNotEqual(Event(self.test_dict).duration, 2.421, 'Duration is wrong')
-        self.assertEqual(Event(self.test_dict).duration, 2.4, 'Duration is wrong')
+        self.assertEqual(Event(self.test_dict).duration, 1.2, 'Duration is wrong')
 
     def test_validation_price(self):
-        self.test_dict['price'] = 'abc'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Price is not a number')
-        self.test_dict['price'] = '-3'
-        self.assertNotEqual(Event(self.test_dict).id, 1, 'Price is negative')
+        wrong_prices = ['abc', '-3', '2', '2.54121']
+        initialized = [1, 1, -1, -1]
+        for x in range(0, len(wrong_prices)):
+            self.test_dict['price'] = wrong_prices[x]
+            self.assertNotEqual(Event(self.test_dict).id, initialized[x])
 
-        self.test_dict['price'] = '2'
-        self.assertEqual(Event(self.test_dict).id, 1, 'Price did not let initialization to happen')
-        self.assertEqual(Event(self.test_dict).price, 2, 'Price is wrong')
-        self.test_dict['price'] = '2.421'
-        self.assertEqual(Event(self.test_dict).id, 1, 'Price did not let initialization to happen')
-        self.assertNotEqual(Event(self.test_dict).price, 2.421, 'Price is wrong')
-        self.assertEqual(Event(self.test_dict).price, 2.42, 'Price is wrong')
+        self.assertEqual(Event(self.test_dict).price, 2.54, 'Price is wrong')
 
     def test_validation_restaurant(self):
         self.test_dict['rest_name'] = 'abc'
@@ -68,7 +58,7 @@ class TestHW7(unittest.TestCase):
             self.test_dict['title'] = x
             self.assertNotEqual(Event(self.test_dict).id, 1)
 
-        self.test_dict['title'] = 'abc'
+        self.test_dict['title'] = 'TestName'
         self.assertEqual(Event(self.test_dict).id, 1, 'Title was not accepted')
 
     def test_validation_date(self):
@@ -78,7 +68,7 @@ class TestHW7(unittest.TestCase):
             self.test_dict['date'] = x
             self.assertNotEqual(Event(self.test_dict).id, 1)
 
-        self.test_dict['date'] = ['2020', '2', '28']
+        self.test_dict['date'] = ['2020', '2', '22']
         self.assertEqual(Event(self.test_dict).id, 1, 'Date was not accepted')
 
     def test_validation_time(self):
@@ -91,34 +81,33 @@ class TestHW7(unittest.TestCase):
         self.assertEqual(Event(self.test_dict).id, 1, 'Time was not accepted')
 
     def test_collection_basic(self):
-        test_dict = {'id': '1',
-                     'duration': '1.2',
-                     'price': '2.54',
-                     'rest_name': '2',
-                     'title': 'TestName',
-                     'date': ['2020', '2', '22'],
-                     'time': ['14', '30']}
-        test_event1 = Event(test_dict)
-        test_dict['id'] = '2'
-        test_event2 = Event(test_dict)
+        test_event1 = Event(self.test_dict)
+        self.test_dict['id'] = '2'
+        test_event2 = Event(self.test_dict)
+        self.test_dict['id'] = '1'
         test_collection = Collection('Tests/EmptyFile.txt')
+        test_collection2 = Collection('Tests/EmptyFile.txt')
         #   append, len and getitem test
         self.assertEqual(len(test_collection), 0, 'Wrong length')
         test_collection.append(test_event1)
         self.assertEqual(len(test_collection), 1, 'Wrong length')
         test_collection.append(test_event2)
         self.assertEqual(len(test_collection), 2, 'Wrong length')
+
+        self.assertEqual(len(test_collection2), 0, 'Should be empty')
         self.assertIs(test_collection[0], test_event1, 'Wrong object')
         self.assertIs(test_collection[1], test_event2, 'Wrong object')
         #   deletion test
         self.assertFalse(test_collection.delete_id('Wrong input'), 'Has to be false')
-        self.assertFalse(test_collection.delete_id(57), 'Has to be false')
-        self.assertTrue(test_collection.delete_id(1), 'Has to be true')
+        self.assertFalse(test_collection2.delete_id(2), 'Has to be false (delete id from col where it is not present)')
+        self.assertTrue(test_collection.delete_id(2), 'Has to be true (delete id from col where it is present)')
+        self.assertFalse(test_collection.delete_id(2), 'Has to be false (delete id from col where it was deleted)')
         self.assertEqual(len(test_collection), 1, 'Wrong length')
-        self.assertIs(test_collection[0], test_event2, 'Wrong object')
+        self.assertIs(test_collection[0], test_event1, 'Wrong object')
         #   editing element test
-        self.assertFalse(test_collection.edit_one(test_collection.find_by_id(2), 'title', '-abc'), 'Should not edit')
-        self.assertTrue(test_collection.edit_one(test_collection.find_by_id(2), 'title', 'good name'), 'Should edit')
+        self.assertFalse(test_collection.edit_one(test_collection.find_by_id(4), 'title', 'good name'), 'No such id')
+        self.assertFalse(test_collection.edit_one(test_collection.find_by_id(2), 'title', '-abc'), 'Wrong title')
+        self.assertTrue(test_collection.edit_one(test_collection.find_by_id(1), 'title', 'good name'), 'Should edit')
 
     def test_collection_sort_write(self):
         test_collection = Collection('Tests/SortTest.txt')
@@ -136,12 +125,11 @@ class TestHW7(unittest.TestCase):
             self.assertEqual(manual_action, program_action)
 
         arguments = ['T', 'I', 'R', 'Da', 'Ti', 'D', 'P', 'I']
-        comparisons = ['ByTitle.txt', 'ByID.txt', 'ByRestaurantName.txt', 'ByDate.txt', 'ByTime.txt', 'ByDuration.txt',
-                       'ByPrice.txt', 'ByID.txt']
+        comparisons = ['Title', 'ID', 'RestaurantName', 'Date', 'Time', 'Duration', 'Price', 'ID']
 
         for x in range(0, len(arguments)):
             test_collection.sorting2(arguments[x])
-            compare('Tests/' + comparisons[x])
+            compare('Tests/By' + comparisons[x] + '.txt')
 
     def test_collection_searching(self):
         test_collection = Collection('Tests/SearchTest.txt')
@@ -159,13 +147,6 @@ class TestHW7(unittest.TestCase):
             self.assertEqual(test_collection.search2(search_args[x]), to_find[x])
 
     def test_history(self):
-        test_dict = {'id': '1',
-                     'duration': '1.2',
-                     'price': '2.54',
-                     'rest_name': '2',
-                     'title': 'TestName',
-                     'date': ['2020', '2', '22'],
-                     'time': ['14', '30']}
         test_collection = Collection('TestsHistory/ChangingFile.txt')
 
         def get_file_content(way):
@@ -185,16 +166,16 @@ class TestHW7(unittest.TestCase):
                          test_collection.undo, test_collection.redo, test_collection.redo,
                          test_collection.undo, test_collection.delete_id, test_collection.redo,
                          test_collection.undo, test_collection.undo, test_collection.undo, test_collection.undo]
-        arguments = [4, 1, Event(test_dict), 14, None, None, None, None, None, None, 8, None, None, None, None, None]
+        args = [4, 1, Event(self.test_dict), 14, None, None, None, None, None, None, 8, None, None, None, None, None]
         comparisons = ['Action1.txt', 'Action2.txt', 'Action3.txt', 'Action4.txt', 'Action3.txt', 'Action2.txt',
                        'Action1.txt', 'Action2.txt', 'Action3.txt', 'Action2.txt', 'Action3Alternative.txt',
                        'Action3Alternative.txt', 'Action2.txt', 'Action1.txt', 'Start.txt', 'Start.txt']
 
         for x in range(0, len(testing_funcs)):
-            if arguments[x] is None:
+            if args[x] is None:
                 testing_funcs[x]()
             else:
-                testing_funcs[x](arguments[x])
+                testing_funcs[x](args[x])
             compare('TestsHistory/' + comparisons[x])
 
 

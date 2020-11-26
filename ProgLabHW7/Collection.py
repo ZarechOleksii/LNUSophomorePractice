@@ -5,7 +5,6 @@ from Momento import Momento
 
 
 class Collection:
-
     search_dict = {'id': 'ID',
                    'duration': 'duration',
                    'price': 'price',
@@ -123,11 +122,11 @@ class Collection:
         return self.history
 
     def edit_one(self, event_to_edit, g_param, g_value):
-        if event_to_edit.edit_value(g_param, g_value):
-            self.history.new_action(Momento(self.all_events), ('Edited element with ID' + str(event_to_edit.id)))
-            return True
-        else:
-            return False
+        if event_to_edit is not False:
+            if event_to_edit.edit_value(g_param, g_value):
+                self.history.new_action(Momento(self.all_events), ('Edited element with ID' + str(event_to_edit.id)))
+                return True
+        return False
 
     def undo(self):
         action = self.history.undo()
