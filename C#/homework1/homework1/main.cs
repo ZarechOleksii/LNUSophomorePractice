@@ -30,6 +30,30 @@ namespace homework1
                 Console.WriteLine($"{value} - {Enum.GetName(typeof(RestaurantNames), value)}");
             }
         }
+        static string EnterValues(string parameter)
+        {
+            string new_data;
+            string[] datesTimes = { "year", "month", "day", "hour", "minute" };
+            Console.WriteLine($"Enter new value for {parameter}:");
+
+            if (parameter == "RestName")
+                Rests();
+
+            if (parameter == "DateTime")
+            {
+                string data = "";
+                foreach (string y in datesTimes)
+                {
+                    Console.WriteLine($"Enter {y}:");
+                    data += Console.ReadLine() + " ";
+                }
+                data += "00";
+                new_data = data;
+            }
+            else
+                new_data = Console.ReadLine();
+            return new_data;
+        }
         static void Main()
         {
             bool flag = true;
@@ -46,7 +70,6 @@ namespace homework1
             {
                 "Id", "Title", "Duration", "Price", "DateTime", "RestName"
             };
-            string[] datesTimes = { "year", "month", "day", "hour", "minute" };
             while (flag)
             {
                 try
@@ -61,31 +84,13 @@ namespace homework1
                             
                             foreach (string x in event_properties)
                             {
-                                string new_data;
-                                Console.WriteLine("Enter " + x +  " of the new Event:");
-
-                                if (x == "RestName")
-                                    Rests();
-
-                                if (x == "DateTime")
-                                {
-                                    string data = "";
-                                    foreach (string y in datesTimes)
-                                    {
-                                        Console.WriteLine($"Enter {y}:");
-                                        data += Console.ReadLine() + " ";
-                                    }
-                                    data += "00";
-                                    new_data = data ;
-                                }
-                                else
-                                    new_data = Console.ReadLine();
+                                string new_data = EnterValues(x);
                                 dictToCreate.Add(x, new_data);
                             }
 
                             Event toAdd = new Event(dictToCreate);
                             if (toAdd.Correct())
-                                if (allEvents.Present(toAdd.Id))
+                                if (allEvents.IsPresent(toAdd.Id))
                                 {
                                     Console.WriteLine("Event with such ID already exists");
                                 }
@@ -119,22 +124,7 @@ namespace homework1
                                 string choice = Console.ReadLine();
                                 if (event_properties.SingleOrDefault(r => r.Equals(choice)) != null)
                                 {
-                                    Console.WriteLine($"Enter new value for {choice}:");
-                                    string new_data;
-                                    if (choice == "RestName")
-                                        Rests();
-                                    if (choice == "DateTime")
-                                    {
-                                        new_data = "";
-                                        foreach (string x in datesTimes)
-                                        {
-                                            Console.WriteLine($"Enter {x}:");
-                                            new_data += Console.ReadLine() + " ";
-                                        }
-                                        new_data += "00";
-                                    }
-                                    else
-                                        new_data = Console.ReadLine();
+                                    string new_data = EnterValues(choice);
                                     typeof(Event).GetProperty(choice).SetValue(eventToEdit, new_data);
                                     if (eventToEdit.Correct())
                                     {

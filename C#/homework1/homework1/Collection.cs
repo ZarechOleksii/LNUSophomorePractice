@@ -16,7 +16,7 @@ namespace homework1
         public Collection(string fileName)
         {
             JArray obj;
-            filePath = "D:\\School\\C# LNY\\Navch Prakt\\homework1\\homework1\\" + fileName;
+            filePath = fileName;
             using (StreamReader file = File.OpenText(filePath))
             using (JsonTextReader reader = new JsonTextReader(file))
             {
@@ -46,7 +46,7 @@ namespace homework1
             coll.Add(to_add);
         }
 
-        public bool Present(int giv_id)
+        public bool IsPresent(int giv_id)
         {
             foreach (Event x in coll)
             {

@@ -108,7 +108,7 @@ namespace homework1
         {
             try
             {
-                StreamReader file = File.OpenText("D:\\School\\C# LNY\\Navch Prakt\\homework1\\homework1\\" + given_input);
+                StreamReader file = File.OpenText(given_input);
                 file.Close();
                 return true;
             }

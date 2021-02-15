@@ -26,9 +26,17 @@
   {
     "Id": 4,
     "Title": "FinalTest",
-    "Price": 12.5,
+    "Price": 11.4,
     "Duration": 24.0,
     "DateTime": "2020 10 20 20 20 00",
+    "RestName": 2
+  },
+  {
+    "Id": 5,
+    "Title": "TesterFinalV2",
+    "Price": 25.55,
+    "Duration": 12.2,
+    "DateTime": "2021 05 03 05 30 00",
     "RestName": 2
   }
 ]
