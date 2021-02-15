@@ -1,0 +1,10 @@
+D:\School\C# LNY\Navch Prakt\homework1\homework1\bin\Debug\homework1.exe.config
+D:\School\C# LNY\Navch Prakt\homework1\homework1\bin\Debug\homework1.exe
+D:\School\C# LNY\Navch Prakt\homework1\homework1\bin\Debug\homework1.pdb
+D:\School\C# LNY\Navch Prakt\homework1\homework1\obj\Debug\homework1.csprojAssemblyReference.cache
+D:\School\C# LNY\Navch Prakt\homework1\homework1\obj\Debug\homework1.csproj.CoreCompileInputs.cache
+D:\School\C# LNY\Navch Prakt\homework1\homework1\obj\Debug\homework1.exe
+D:\School\C# LNY\Navch Prakt\homework1\homework1\obj\Debug\homework1.pdb
+D:\School\C# LNY\Navch Prakt\homework1\homework1\bin\Debug\Newtonsoft.Json.dll
+D:\School\C# LNY\Navch Prakt\homework1\homework1\bin\Debug\Newtonsoft.Json.xml
+D:\School\C# LNY\Navch Prakt\homework1\homework1\obj\Debug\homework1.csproj.CopyComplete
