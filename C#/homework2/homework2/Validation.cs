@@ -9,72 +9,30 @@ namespace homework1
 {
     static class Validation
     {
-        public static int ValidateInt(string given_input)
+        public static int ValidateId(int given_input)
         {
-            int toReturn;
-            try
-            {
-                toReturn = Convert.ToInt32(given_input);
-            }
-            catch
-            {
-                throw new Exception("Input not an int");
-            }
-            return toReturn;
-        }
-        public static int ValidateId(string given_input)
-        {
-            int toReturn;
-            try
-            {
-                toReturn = Convert.ToInt32(given_input);
-            }
-            catch
-            {
-                throw new Exception("Id not an int");
-            }
-            if (toReturn <= 0)
+            if (given_input <= 0)
             {
                 throw new Exception("Id has to be larger than 0");
             }
-            return toReturn;
+            return given_input;
         }
 
-        public static double ValidatePrice(string given_input)
+        public static double ValidatePrice(double given_input)
         {
-            double toReturn;
-            try
-            {
-                toReturn = double.Parse(given_input, System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                throw new Exception("Price not a number");
-            }
-            if (toReturn < 0)
+            if (given_input < 0)
             {
                 throw new Exception("Price is lower than 0");
             }
-            toReturn = Math.Round(toReturn, 2);
-            return toReturn;
+            return Math.Round(given_input, 2);
         }
-        public static double ValidateDuration(string given_input)
+        public static double ValidateDuration(double given_input)
         {
-            double toReturn;
-            try
-            {
-               toReturn = double.Parse(given_input, System.Globalization.CultureInfo.InvariantCulture);
-            }
-            catch
-            {
-                throw new Exception("Duration not a number");
-            }
-            if (toReturn <= 0)
+            if (given_input <= 0)
             {
                 throw new Exception("Duration has to be positive");
             }
-            toReturn = Math.Round(toReturn, 1);
-            return toReturn;
+            return Math.Round(given_input, 1);
         }
         public static DateTime ValidateDateTime(string given_input)
         {
@@ -88,16 +46,16 @@ namespace homework1
                 throw new Exception("Input is not Date & Time");
             }
         }
-        public static RestaurantNames ValidateRestName(string given_input)
+        public static RestaurantNames ValidateRestName(dynamic given_input)
         {
             try
             {
-                int toReturn = Convert.ToInt32(given_input); ;
-                if (!typeof(RestaurantNames).IsEnumDefined(toReturn))
+                int new_value = Convert.ChangeType(given_input, typeof(int));
+                if (!typeof(RestaurantNames).IsEnumDefined(new_value))
                 {
                     throw new Exception("No such restaurant");
                 }
-                return (RestaurantNames)toReturn;
+                return (RestaurantNames)new_value;
             }
             catch (Exception e) when (e.Message != "No such restaurant")
             {

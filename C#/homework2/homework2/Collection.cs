@@ -23,22 +23,26 @@ namespace homework1
             {
                 obj = (JArray)JToken.ReadFrom(reader);
             }
-            Dictionary<string, string>[] objects = obj.ToObject<Dictionary<string, string>[]>();
+            Dictionary<string, dynamic>[] objects = obj.ToObject<Dictionary<string, dynamic>[]>();
             int obj_counter = 1;
-            foreach (Dictionary<string, string> x in objects)
+            foreach (Dictionary<string, dynamic> x in objects)
             {
                 Console.WriteLine($"\nObject {obj_counter}:");
                 bool correct_obj = true;
                 T new_object = (T)typeof(T).GetConstructor(new Type[0]).Invoke(null);
-                foreach (KeyValuePair<string, string> y in x)
+                foreach (KeyValuePair<string, dynamic> y in x)
                 {
                     try
                     {
-                        typeof(T).GetProperty(y.Key).SetValue(new_object, y.Value);
+                        dynamic new_data = Convert.ChangeType(y.Value, typeof(T).GetProperty(y.Key).PropertyType);
+                        typeof(T).GetProperty(y.Key).SetValue(new_object, new_data);
                     }
                     catch (Exception e)
                     {
-                        Console.WriteLine(e.InnerException.Message);
+                        if (e.InnerException != null)
+                            Console.WriteLine(e.InnerException.Message);
+                        else
+                            Console.WriteLine($"{y.Key} has wrong type");
                         correct_obj = false;
                     }
                 }
@@ -55,9 +59,9 @@ namespace homework1
             }
         }
 
-        public void Add(T to_add)
+        public void Add(object to_add)
         {
-            coll.Add(to_add);
+            coll.Add((T)to_add);
         }
 
         public bool IsPresent(int giv_id)
@@ -147,7 +151,7 @@ namespace homework1
             JArray array = new JArray { };
             foreach (T x in sorted)
             {
-                JObject singleObject = JObject.Parse(JsonConvert.SerializeObject(x, new JsonSerializerSettings {DateFormatString = "yyyy MM dd HH mm ss" }));
+                JObject singleObject = JObject.Parse(JsonConvert.SerializeObject(x));
                 array.Add(singleObject);
             }
             using (StreamWriter file = File.CreateText(filePath))

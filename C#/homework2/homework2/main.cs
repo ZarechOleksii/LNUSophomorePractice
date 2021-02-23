@@ -5,7 +5,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-
+using System.Reflection;
 namespace homework1
 {
     class Program
@@ -20,39 +20,32 @@ namespace homework1
                         "\nP to show all" +
                         "\nQ to quit\n");
         }
-        static void Rests()
-        {
-            int[] values = (int[]) Enum.GetValues(typeof(RestaurantNames));
 
-            Console.WriteLine($"Available Restaurants (choose a number):");
-            foreach (int value in values)
-            {
-                Console.WriteLine($"{value} - {Enum.GetName(typeof(RestaurantNames), value)}");
-            }
-        }
-        static string EnterValues(string parameter)
+        static dynamic EnterValues(PropertyInfo property)
         {
             string new_data;
-            string[] datesTimes = { "year", "month", "day", "hour", "minute" };
-            Console.WriteLine($"Enter new value for {parameter}:");
+            Console.WriteLine($"Enter new value for {property.Name}:");
 
-            if (parameter == "RestName")
-                Rests();
-
-            if (parameter == "DateTime")
+            if (property.PropertyType.Equals(typeof(DateTime)))
             {
                 string data = "";
-                foreach (string y in datesTimes)
-                {
-                    Console.WriteLine($"Enter {y}:");
-                    data += Console.ReadLine() + " ";
-                }
-                data += "00";
+                Console.WriteLine("Enter date:");
+                data += Console.ReadLine() + "T";
+                Console.WriteLine("Enter time:");
+                data += Console.ReadLine();
                 new_data = data;
             }
             else
                 new_data = Console.ReadLine();
-            return new_data;
+            try
+            {
+                var toReturn = Convert.ChangeType(new_data, property.PropertyType, System.Globalization.CultureInfo.InvariantCulture);
+                return toReturn;
+            }
+            catch 
+            {
+                throw new Exception($"Wrong type of {property.Name}");
+            }
         }
         static void Main()
         {
@@ -65,115 +58,114 @@ namespace homework1
                 fileName = Console.ReadLine();
             }
             while (!Validation.ValidateFileName(fileName));
-            Collection<Event> allEvents = new Collection<Event>(fileName);
-            string[] event_properties = new string[6]
-            {
-                "Id", "Title", "Duration", "Price", "DateTime", "RestName"
-            };
+
+            Type to_work = typeof(Event);
+            
+            Collection<Event> allObjects = new Collection<Event>(fileName);
+            
+            PropertyInfo[] object_properties = to_work.GetProperties();
             while (flag)
             {
-                try
+                Menu();
+                givOption = Convert.ToChar(Console.ReadLine());
+                switch (givOption)
                 {
-                    Menu();
-                    givOption = Convert.ToChar(Console.ReadLine());
-                    switch (givOption)
-                    {
-                        case 'Q': flag = false; break;
-                        case 'A':
-                            Dictionary<string, string> dictToCreate = new Dictionary<string, string> { };
+                    case 'Q': flag = false; break;
+                    case 'A':
                             
-                            foreach (string x in event_properties)
+                        object toAdd = Activator.CreateInstance(to_work);
+                        try
+                        {
+                            foreach (PropertyInfo x in object_properties)
+                                to_work.GetProperty(x.Name).SetValue(toAdd, EnterValues(x));
+                            if (allObjects.IsPresent((int)to_work.GetProperty("ID", BindingFlags.IgnoreCase | BindingFlags.Public | BindingFlags.Instance).GetValue(toAdd)))
                             {
-                                string new_data = EnterValues(x);
-                                dictToCreate.Add(x, new_data);
+                                Console.WriteLine("Object with such ID already exists");
                             }
+                            else
+                            {
+                                allObjects.Add(toAdd);
+                                Console.WriteLine("Object successfully added to collection");
+                                allObjects.Overwrite();
+                            }
+                        }
+                        catch (Exception e)
+                        {
+                            Console.WriteLine(e.Message);
+                            if (e.InnerException != null)
+                                Console.WriteLine(e.InnerException.Message);
+                        }
+                        break;
 
-                            Event toAdd = new Event(dictToCreate);
-                            if (toAdd.Correct())
-                                if (allEvents.IsPresent(toAdd.Id))
-                                {
-                                    Console.WriteLine("Event with such ID already exists");
-                                }
-                                else 
-                                {
-                                    allEvents.Add(toAdd);
-                                    Console.WriteLine("Event successfully added to collection");
-                                    allEvents.Overwrite();
-                                }
-                            else
+                    case 'D':
+                        Console.Write(allObjects.PrintAll());
+                        Console.WriteLine("Select the object to delete:");
+                        string to_delete = Console.ReadLine();
+                        Console.WriteLine(allObjects.DeleteOne(to_delete));
+                        allObjects.Overwrite(); break;
+
+                    case 'E':
+                        Console.Write(allObjects.PrintAll());
+                        Console.WriteLine("Select the object to edit:");
+                        string to_edit = Console.ReadLine();
+                        object objectToEdit = allObjects.FindByID(to_edit);
+                        if (objectToEdit != null)
+                        {
+                            Console.Write(objectToEdit);
+                            Console.WriteLine("Select the property to edit:");
+                            string choice = Console.ReadLine();
+                            PropertyInfo chosenProperty = object_properties.SingleOrDefault(r => r.Name.Equals(choice));
+                            if (chosenProperty != null)
                             {
-                                Console.WriteLine("There were mistakes in your input:");
-                                toAdd.PrintErrors();
-                            }
-                            break;
-                        case 'D':
-                            Console.Write(allEvents.PrintAll());
-                            Console.WriteLine("Select the Event to delete:");
-                            string to_delete = Console.ReadLine();
-                            Console.WriteLine(allEvents.DeleteOne(to_delete));
-                            allEvents.Overwrite(); break;
-                        case 'E':
-                            Console.Write(allEvents.PrintAll());
-                            Console.WriteLine("Select the Event to edit:");
-                            string to_edit = Console.ReadLine();
-                            Event eventToEdit = allEvents.FindByID(to_edit);
-                            if (eventToEdit != null)
-                            {
-                                Console.Write(eventToEdit);
-                                Console.WriteLine("Select the property to edit:");
-                                string choice = Console.ReadLine();
-                                if (event_properties.SingleOrDefault(r => r.Equals(choice)) != null)
+                                try
                                 {
-                                    string new_data = EnterValues(choice);
-                                    try
-                                    {
-                                        typeof(Event).GetProperty(choice).SetValue(eventToEdit, new_data);
-                                        Console.Write($"Success\n{eventToEdit}");
-                                        allEvents.Overwrite();
-                                    }
-                                    catch (Exception e)
-                                    {
+                                    var new_data = EnterValues(chosenProperty);
+                                    to_work.GetProperty(choice).SetValue(objectToEdit, new_data);
+                                    Console.Write($"Success\n{objectToEdit}");
+                                    allObjects.Overwrite();
+                                }
+                                catch (Exception e)
+                                {
+                                    if (e.InnerException != null)
                                         Console.WriteLine(e.InnerException.Message);
-                                    }
+                                    else
+                                        Console.WriteLine(e.Message);
                                 }
-                                else
-                                    Console.WriteLine("No such property");
-                            }
-                            else
-                                Console.WriteLine("No such item");
-                            break;
-                        case 'S':
-                            Console.WriteLine("Select the property to sort by:");
-                            string parameter = Console.ReadLine();
-                            if (event_properties.SingleOrDefault(r => r.Equals(parameter)) != null)
-                            {
-                                if (allEvents.Sorting(parameter))
-                                {
-                                    Console.WriteLine("Success");
-                                    Console.Write(allEvents.PrintAll());
-                                }
-                                else
-                                    Console.WriteLine("Nothing to sort");
                             }
                             else
                                 Console.WriteLine("No such property");
-                            break;
-                        case 'F':
-                            Console.WriteLine("Enter what to find:");
-                            string to_find = Console.ReadLine();
-                            Console.Write(allEvents.FindObjects(to_find));
-                            break;
-                        case 'P': Console.Write(allEvents.PrintAll()); break;
-                        default: Console.WriteLine("No such option"); break;
-                    }
-                    
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.ToString());
-                    Console.WriteLine("Mistakes were made");
-                    Console.ReadKey();
-                }
+                        }
+                        else
+                            Console.WriteLine("No such item");
+                        break;
+
+                    case 'S':
+                        Console.WriteLine("Select the property to sort by:");
+                        string parameter = Console.ReadLine();
+                        if (object_properties.SingleOrDefault(r => r.Name.Equals(parameter)) != null)
+                        {
+                            if (allObjects.Sorting(parameter))
+                            {
+                                Console.WriteLine("Success");
+                                Console.Write(allObjects.PrintAll());
+                            }
+                            else
+                                Console.WriteLine("Nothing to sort");
+                        }
+                        else
+                            Console.WriteLine("No such property");
+                        break;
+
+                    case 'F':
+                        Console.WriteLine("Enter what to find:");
+                        string to_find = Console.ReadLine();
+                        Console.Write(allObjects.FindObjects(to_find));
+                        break;
+
+                    case 'P': Console.Write(allObjects.PrintAll()); break;
+
+                    default: Console.WriteLine("No such option"); break;
+                } 
             }
             Console.WriteLine("The end");
             Console.ReadKey();

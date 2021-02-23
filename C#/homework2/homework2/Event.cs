@@ -42,10 +42,9 @@ namespace homework1
         override public string ToString()
         {
             string to_return = "";
-            string[] properties = new string[] {"Id", "Title","Price", "Duration", "DateTime", "RestName" };
-            foreach (string x in properties)
+            foreach (PropertyInfo x in this.GetType().GetProperties())
             {
-                to_return += x + " - " + typeof(Event).GetProperty(x).GetValue(this) + "\n"; 
+                to_return += x.Name + " - " + x.GetValue(this) + "\n"; 
             }
             return to_return;
         }
@@ -54,56 +53,36 @@ namespace homework1
             return !errors.Any();
         }
         //setters & getters
-        public dynamic Id
+        public int Id
         {
             get { return this.id; }
-            set 
-            {
-                int new_id_int = Validation.ValidateId(value);
-                this.id = new_id_int;
-            }
+            set { this.id = Validation.ValidateId(value); }
         }
-        public dynamic Title
+        public string Title
         {
             get { return this.title; }
             set { this.title = value; }
         }
-        public dynamic Price
+        public double Price
         {
             get { return this.price; }
-            set
-            {
-                double new_price_double = Validation.ValidatePrice(value);
-                this.price = new_price_double;
-            }
+            set { this.price = Validation.ValidatePrice(value); }
         }
-        public dynamic Duration
+        public double Duration
         {
             get { return this.duration; }
-            set
-            {
-                double new_duration_double = Validation.ValidateDuration(value);
-                this.duration = new_duration_double;
-            }
+            set { this.duration = Validation.ValidateDuration(value); }
         }
 
-        public dynamic DateTime
+        public DateTime DateTime
         {
             get { return this.dateAndTime; }
-            set
-            {
-                DateTime new_datetime = Validation.ValidateDateTime(value);
-                this.dateAndTime = new_datetime;
-            }
+            set{ this.dateAndTime = value; }
         }
         public dynamic RestName
         {
             get { return this.restName; }
-            set
-            {
-                RestaurantNames new_rest_name = Validation.ValidateRestName(value);
-                this.restName = new_rest_name;
-            }
+            set { this.restName = Validation.ValidateRestName(value); }
         }
     }
 }

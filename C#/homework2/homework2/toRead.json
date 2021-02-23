@@ -4,7 +4,7 @@
     "Title": "BTesterEventOne",
     "Price": 2.52,
     "Duration": 5.5,
-    "DateTime": "2020 10 22 14 30 00",
+    "DateTime": "2020-10-22T14:30:00",
     "RestName": 1
   },
   {
@@ -12,7 +12,7 @@
     "Title": "ATesterEventTwo",
     "Price": 0.0,
     "Duration": 2.3,
-    "DateTime": "2021 12 31 23 59 00",
+    "DateTime": "2021-12-31T23:59:00",
     "RestName": 2
   },
   {
@@ -20,7 +20,7 @@
     "Title": "akanewgenerics",
     "Price": 14.2,
     "Duration": 27.7,
-    "DateTime": "2022 09 10 12 00 00",
+    "DateTime": "2022-09-10T12:00:00",
     "RestName": 2
   },
   {
@@ -28,7 +28,7 @@
     "Title": "FinalTest",
     "Price": 11.4,
     "Duration": 24.0,
-    "DateTime": "2020 10 20 20 20 00",
+    "DateTime": "2020-10-20T20:20:00",
     "RestName": 2
   },
   {
@@ -36,7 +36,7 @@
     "Title": "TesterFinalV2",
     "Price": 25.55,
     "Duration": 12.2,
-    "DateTime": "2021 05 03 05 30 00",
+    "DateTime": "2021-05-03T05:30:00",
     "RestName": 2
   },
   {
@@ -44,7 +44,7 @@
     "Title": "newTitle",
     "Price": 25.63,
     "Duration": 15.5,
-    "DateTime": "2021 12 20 14 30 00",
-    "RestName": 1
+    "DateTime": "2021-12-20T14:30:00",
+    "RestName": 2
   }
 ]
