@@ -13,7 +13,19 @@ namespace EventApi
     {
         public static void Main(string[] args)
         {
-            DBAccess.OpenConection();
+            string filePath = System.IO.Directory.GetCurrentDirectory() + "\\access.env";
+            string[] text = System.IO.File.ReadAllLines(filePath);
+            foreach (string x in text)
+            {
+                var parts = x.Split('=', StringSplitOptions.RemoveEmptyEntries);
+                Environment.SetEnvironmentVariable(parts[0], parts[1]);
+                
+            }
+            string conString = "";
+            string[] conStr = { "Host", "Username", "Password", "Database" };
+            foreach (string x in conStr)
+                conString += x + " = " + Environment.GetEnvironmentVariable(x) + ";";
+            Environment.SetEnvironmentVariable("ConString", conString);
             CreateHostBuilder(args).Build().Run();
         }
 

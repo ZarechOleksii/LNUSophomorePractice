@@ -3,14 +3,17 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using NpgsqlTypes;
 
 namespace EventApi
 {
     public enum RestaurantNames
     {
-        Delice = 1,
-        EuroHotel = 2,
-        Morio = 3
-        
+        [PgName("Delice")]
+        Delice,
+        [PgName("EuroHotel")]
+        EuroHotel,
+        [PgName("Morio")]
+        Morio
     }
 }

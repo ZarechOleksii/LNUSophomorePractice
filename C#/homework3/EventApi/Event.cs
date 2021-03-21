@@ -1,4 +1,5 @@
-﻿using Microsoft.OpenApi.Validations;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Validations;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
@@ -10,32 +11,32 @@ using System.Threading.Tasks;
 
 namespace EventApi
 {
-    public class Event : IValidatableObject
+    public class Event
     {
+        [Key]
+        public int Id { get; set; }
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Title can't be null")]
+        [StringLength(30, ErrorMessage = "Title cannot be longer than 30 characters")]
         public string Title { get; set; }
-        public double Duration { get; set; }
-        public double Price { get; set; }
-        public string RestName { get; set; }
-        public string DateTime { get; set; }
+
+        [Required(ErrorMessage = "Duration can't be null")]
+        [Range(0.1, 99.9, ErrorMessage = "Wrong Duration")]
+        [RegularExpression(@"^\d+(\,\d{1,1})?$", ErrorMessage = "Maximum one decimal space for duration")]
+        public decimal Duration { get; set; }
+
+        [Required(ErrorMessage = "Price can't be null")]
+        [Range(0, 999.75, ErrorMessage = "Wrong Price")]
+        [RegularExpression(@"^\d+(\,\d{1,2})?$", ErrorMessage = "Maximum two decimal spaces for price")]
+        public decimal Price { get; set; }
+
+        [Required(ErrorMessage = "Restaurant name can't be null or whitspace")]
+        [EnumDataType(typeof(RestaurantNames), ErrorMessage = "Not a restaurant")]
+        public RestaurantNames RestName { get; set; }
+
+        [Required(ErrorMessage = "Datetime cannot be null")]
+        [DataType(DataType.DateTime, ErrorMessage = "Not a datetime")]
+        public DateTime DateTime { get; set; }
         
-        public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
-        {
-            List<ValidationResult> errors = new();
-            if (string.IsNullOrWhiteSpace(this.Title))
-                errors.Add(new ValidationResult("No title"));
-            else if (this.Title.Length > 30)
-                errors.Add(new ValidationResult("Title too long"));
-            if (this.Duration <= 0 || this.Duration >= 100)
-                errors.Add(new ValidationResult("Wrong duration"));
-            if (this.Price < 0 || this.Price >= 1000)
-                errors.Add(new ValidationResult("Wrong Price"));
-            if (string.IsNullOrWhiteSpace(this.RestName))
-                errors.Add(new ValidationResult("No restaurant name"));
-            else if (!Enum.IsDefined(typeof(RestaurantNames), this.RestName))
-                errors.Add(new ValidationResult("No such restaurant"));
-            if (!System.DateTime.TryParse(this.DateTime, out _))
-                errors.Add(new ValidationResult("Wrong datetime"));
-            return errors;
-        }
     }
 }
